@@ -1,0 +1,41 @@
+//digiindicator.ir
+//@version=5
+indicator(title="Trend and Momentum Digi Indicator", shorttitle="TMDI", timeframe="", timeframe_gaps=true)
+h1 = hline(2)
+h5 = hline(-5)
+[_, mac, _] = ta.macd(close, 12, 26, 9)
+nrsi= ta.rsi(close,14)
+hrsi=ta.highest(nrsi, 10)
+lrsi=ta.lowest(nrsi, 10)
+mo_g = input.int(title="Buyers", minval=1, maxval=500, defval=21)
+mo_r = input.int(title="Sellers", minval=1, maxval=500, defval=34)
+h_k = input.int(title="General process", minval=1, maxval=500, defval=144)
+ma21 = ta.sma(close,mo_g)
+ma34 = ta.sma(close,mo_r)
+ma144 = ta.sma(close,h_k)
+src = input(title="Source", defval=close)
+b3 = ma21>ma34 and src>ma144 and ma144[1]<ma144
+b2 = (ma21>ma34 and src>ma144 and ma144[1]>ma144) or (ma21>ma34 and ma144[1]<ma144 and src<ma144)  or (src>ma144 and ma144[1]<ma144 and ma21<ma34)
+bsh = (ma21>ma34 and src>ma144) or (ma21>ma34 and ma144[1]<ma144)  or (src>ma144 and ma144[1]<ma144)
+s3 = ma21<ma34 and src<ma144 and ma144[1]>ma144
+s2 = (ma21<ma34 and src<ma144 and ma144[1]<ma144) or (ma21<ma34 and src>ma144 and ma144[1]>ma144) or (ma21>ma34 and src<ma144 and ma144[1]>ma144)
+ssh = (ma21<ma34 and src<ma144) or (ma21<ma34 and ma144[1]>ma144) or ( src<ma144 and ma144[1]>ma144)
+tf = if (lrsi<nrsi and nrsi>50) or (hrsi>nrsi and nrsi<50)
+    false
+else 
+    true
+ft = if (mac>0 and ma21>ma34) or (mac<0 and ma34>ma21)
+    false
+else 
+    true
+plot(b3?2:na, style=plot.style_columns, color=#2bff00)
+plot(b2?1:na, style=plot.style_columns, color=#77dc7f)
+plot(s3?-2:na, style=plot.style_columns, color=#ff0000)
+plot(s2?-1:na, style=plot.style_columns, color=#eb9c9c)
+plot(lrsi<nrsi and nrsi>50?-3:na, style=plot.style_linebr, color=#2bff00)
+plot(hrsi>nrsi and nrsi<50?-3:na, style=plot.style_linebr, color=#ff0707)
+plot(mac>0 and ma21>ma34?-4:na, style=plot.style_linebr, color=#2bff00)
+plot(mac<0 and ma34>ma21?-4:na, style=plot.style_linebr, color=#ff0707)
+plot(ft==true?-4:na, style=plot.style_linebr, color=#ffffff)
+plot(tf==true?-3:na, style=plot.style_linebr, color=#ffffff)
+fill(h1, h5, color= color.new(#8B0000, 90))
